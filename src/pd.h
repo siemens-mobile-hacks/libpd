@@ -16,14 +16,14 @@ typedef struct {
     char key[PD_MAX_KEY_SIZE + 1];
     pd_node_type_t type;
     union {
-        int integer;
+        long integer;
         char string[PD_MAX_VALUE_SIZE + 1];
     } value;
 } PD_NODE;
 
 typedef PD_NODE pd_node_t;
 
-pd_node_t *pd_alloc_integer_node(const char *group, const char *key, int value);
+pd_node_t *pd_alloc_integer_node(const char *group, const char *key, long value);
 pd_node_t *pd_alloc_string_node(const char *group, const char *key, const char *value);
 int pd_read_file(const char *file_name, pd_node_t ***nodes);
 int pd_write_file(const char *file_name, const pd_node_t **nodes);

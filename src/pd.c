@@ -31,7 +31,7 @@ pd_node_t *pd_alloc_node(const char *group, const char *key) {
     return node;
 }
 
-pd_node_t *pd_alloc_integer_node(const char *group, const char *key, int value) {
+pd_node_t *pd_alloc_integer_node(const char *group, const char *key, long value) {
     pd_node_t *node = pd_alloc_node(group, key);
     if (node) {
         node->type = PD_NODE_INT;
@@ -119,7 +119,7 @@ pd_node_t *pd_parse_line(const char *p) {
     value[value_len] = '\0';
 
     pd_node_t *node = NULL;
-    const int integer = (int)strtol(value, &endptr, 10);
+    const long integer = strtol(value, &endptr, 10);
     if (endptr == value || *endptr != '\0') { // is not integer!
         node = pd_alloc_string_node(group, key, value);
     } else {
@@ -200,7 +200,7 @@ int pd_read_file(const char *file_name, PD_NODE ***nodes) {
                 }
                 printf("%s=", node->key);
                 if (node->type == PD_NODE_INT) {
-                    printf("%d", node->value.integer);
+                    printf("%ld", node->value.integer);
                 } else {
                     printf("%s", node->value.string);
                 }
@@ -237,7 +237,7 @@ int pd_write_file(const char *file_name, const pd_node_t **nodes) {
         const size_t key_len = strlen(node->key);
         char value[PD_MAX_VALUE_SIZE + 1];
         if (node->type == PD_NODE_INT) {
-            sprintf(value, "%d", node->value.integer);
+            sprintf(value, "%ld", node->value.integer);
         } else {
             strcpy(value, node->value.string);
         }

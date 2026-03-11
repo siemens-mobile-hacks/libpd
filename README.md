@@ -23,7 +23,7 @@ Whitespace lines are ignored.
 ## API Reference
 
 ```C
-pd_node_t *pd_alloc_integer_node(const char *group, const char *key, int value);
+pd_node_t *pd_alloc_integer_node(const char *group, const char *key, long value);
 ```
 Creates a new node holding an integer value.
 
