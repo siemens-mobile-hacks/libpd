@@ -275,6 +275,26 @@ int pd_write_file(const char *file_name, const pd_node_t **nodes) {
     return 0;
 }
 
+int pd_get_max_group_size() {
+    return PD_MAX_GROUP_SIZE;
+}
+
+int pd_get_max_key_size() {
+    return PD_MAX_KEY_SIZE;
+}
+
+int pd_get_max_value_size() {
+    return PD_MAX_VALUE_SIZE;
+}
+
+size_t pd_get_size(pd_node_t **nodes) {
+    int i = 0;
+    while (nodes[i] != NULL) {
+        i++;
+    };
+    return i;
+}
+
 void pd_free_node(pd_node_t *node) {
     if (node) {
         free(node);
@@ -288,16 +308,4 @@ void pd_free_nodes(pd_node_t **nodes) {
         }
         free(nodes);
     }
-}
-
-int pd_get_max_group_size() {
-    return PD_MAX_GROUP_SIZE;
-}
-
-int pd_get_max_key_size() {
-    return PD_MAX_KEY_SIZE;
-}
-
-int pd_get_max_value_size() {
-    return PD_MAX_VALUE_SIZE;
 }

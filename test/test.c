@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <assert.h>
 #include <pd.h>
 
 pd_node_t **parse_file(const char *file_name) {
@@ -23,8 +24,10 @@ int main() {
     nodes = parse_file("fak.pd");
     pd_free_nodes(nodes);
     nodes = parse_file("apidc_setup.pd");
+    assert(pd_get_size(nodes) == 13);
     pd_free_nodes(nodes);
     nodes = parse_file("syncmlds.pd");
+    assert(pd_get_size(nodes) == 15);
     pd_free_nodes(nodes);
     nodes = parse_file("userprofiles.pd");
     if (nodes) {
