@@ -268,3 +268,15 @@ void pd_free_nodes(pd_node_t **nodes) {
         free(nodes);
     }
 }
+
+int pd_get_max_group_size() {
+    return PD_MAX_GROUP_SIZE;
+}
+
+int pd_get_max_key_size() {
+    return PD_MAX_KEY_SIZE;
+}
+
+int pd_get_max_value_size() {
+    return PD_MAX_VALUE_SIZE;
+}

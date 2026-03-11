@@ -28,3 +28,7 @@ pd_node_t *pd_alloc_string_node(const char *group, const char *key, const char *
 int pd_read_file(const char *file_name, pd_node_t ***nodes);
 int pd_write_file(const char *file_name, const pd_node_t **nodes);
 void pd_free_nodes(pd_node_t **nodes);
+
+int pd_get_max_group_size();
+int pd_get_max_key_size();
+int pd_get_max_value_size();
