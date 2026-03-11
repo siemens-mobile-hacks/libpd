@@ -52,8 +52,8 @@ int pd_read_file(const char *file_name, pd_node_t ***nodes);
 Reads a `.pd` file and creates an array of nodes.
 
 - Parameters
-  - `file_name` – path to the input file.
-  - `nodes` – output parameter. On success, `*nodes` points to a newly allocated NULL‑terminated array of `pd_node_t*` pointers.
+  - `file_name` - path to the input file.
+  - `nodes` - output parameter. On success, `*nodes` points to a newly allocated NULL‑terminated array of `pd_node_t*` pointers.
 - Returns
   - `0` on success (including the case of an empty file, in which case a minimal array containing only a `NULL` pointer is allocated).
   - `-1` if the file cannot be opened.
@@ -66,16 +66,64 @@ int pd_write_file(const char *file_name, const pd_node_t **nodes);
 Writes an array of nodes to a file in the `.pd` format.
 
 - Parameters
-  - `file_name` – path to the output file.
-  - `nodes` – NULL‑terminated array of node pointers.
+  - `file_name` - path to the output file.
+  - `nodes` - NULL‑terminated array of node pointers.
 - Returns
   - `0` on success.
   - `-1` if the file cannot be created.
   - `-2` if a write error occurs.
 
 ```C
+size_t pd_get_max_group_size(void);
+```
+Returns the maximum allowed length for a group name (excluding the null terminator).
+
+```C
+size_t pd_get_max_key_size(void);
+```
+Returns the maximum allowed length for a key name (excluding the null terminator).
+
+```C
+size_t pd_get_max_value_size(void);
+```
+Returns the maximum allowed length for a string value (excluding the null terminator).
+
+```C
+size_t pd_get_size(pd_node_t **nodes);
+```
+Counts the number of nodes in a NULL‑terminated array.
+
+- Parameters
+  - `nodes` - pointer to a NULL‑terminated array of `pd_node_t*` pointers.
+
+Returns the number of nodes in the array (excluding the terminating `NULL`).
+
+```C
+void pd_add_node(pd_node_t ***nodes, pd_node_t *node);
+```
+Appends a node to the end of a dynamically allocated NULL‑terminated array.
+- Parameters
+  - `nodes` - pointer to the array pointer.
+  - `node` - pointer to the node to add (must not be `NULL`).
+
+```C
+void pd_delete_node(pd_node_t ***nodes, size_t id);
+```
+Removes a node at the specified index from a NULL‑terminated array.
+- Parameters
+  - `nodes` - pointer to the array pointer.
+  - `id` - zero‑based index of the node to delete.
+
+```C
+void pd_free_node(pd_node_t *node);
+```
+Frees memory allocated for a single node.
+- Parameters
+  - `node` - pointer to the node to free.
+
+```C
 void pd_free_nodes(pd_node_t **nodes);
 ```
 Frees all memory allocated for the node array, including the nodes themselves and the array.
 - Parameters
-  - `nodes` – pointer to a NULL‑terminated array previously obtained from `pd_read_file` (or created manually). After the call `*nodes` is set to NULL.
+  - `nodes` - pointer to a NULL‑terminated array previously obtained from `pd_read_file` (or created manually). After the call, the array and all nodes are freed.
