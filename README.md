@@ -7,6 +7,7 @@ libpd is a lightweight C library for parsing and generating `.pd` configuration 
 ```
 000024:T:SHOW_FUNCTION=1
 000037:T:FAK_KEY_STAR.FLAG_READONLY=1
+000020:T:EmptyValue=
 ```
 
 Each line in a `.pd` file has the following structure:
@@ -14,7 +15,7 @@ Each line in a `.pd` file has the following structure:
 - **`:T:`** – fixed marker indicating the start of the actual data.
 - **Parameter name** – can be either `key` alone (e.g., `SHOW_FUNCTION`) or `group.key` (e.g., `FAK_KEY_STAR.FLAG_READONLY`).
 - **`=`** – separates name and value.
-- **Value** – can be an integer or a string.
+- **Value** – can be an integer, a string, or **empty** (e.g., EmptyValue=).
 - Lines end with `\r\n`, but the length prefix does **not** include these characters.
 
 Whitespace lines are ignored.
@@ -41,7 +42,7 @@ Creates a new node holding a string value.
 - Parameters
   - `group` - group name (may be `NULL` or an empty string if no group is needed). The length must not exceed `PD_MAX_GROUP_SIZE`.
   - `key` - key name (must not be `NULL` or empty, otherwise the function fails). The length must not exceed `PD_MAX_KEY_SIZE`.
-  - `value` - string to store. If `NULL` or an empty string, the function returns `NULL`. The length must not exceed `PD_MAX_VALUE_SIZE`.
+  - `value` - string to store. If `NULL` or an empty string, an empty string is stored in the node. The length (if non‑empty) must not exceed `PD_MAX_VALUE_SIZE`.
 
 Returns a pointer to the newly allocated `pd_node_t` structure or `NULL`.
 
@@ -54,7 +55,7 @@ Reads a `.pd` file and creates an array of nodes.
   - `file_name` – path to the input file.
   - `nodes` – output parameter. On success, `*nodes` points to a newly allocated NULL‑terminated array of `pd_node_t*` pointers.
 - Returns
-  - `0` on success.
+  - `0` on success (including the case of an empty file, in which case a minimal array containing only a `NULL` pointer is allocated).
   - `-1` if the file cannot be opened.
   - A positive line number if a parsing error occurs on that line.
   - Negative values for other I/O or memory errors.

@@ -15,32 +15,41 @@
 #define PD_TAG_MARK ":T:"
 
 pd_node_t *pd_alloc_node(const char *group, const char *key) {
-    pd_node_t *node = NULL;
-    const int is_group = (group && strlen(group));
-    const int is_key = (key && strlen(key));
-    if ((is_group && is_key) || is_key) {
-        node = malloc(sizeof(pd_node_t));
-        if (is_group) {
-            strcpy(node->group, group);
-        }
-        strcpy(node->key, key);
+    if (!key || !*key) {
+        return NULL;
     }
+
+    pd_node_t *node = malloc(sizeof(pd_node_t));
+    if (group && *group) {
+        strncpy(node->group, group, PD_MAX_GROUP_SIZE);
+        node->group[PD_MAX_GROUP_SIZE] = '\0';
+    } else {
+        node->group[0] = '\0';
+    }
+    strncpy(node->key, key, PD_MAX_KEY_SIZE);
+    node->key[PD_MAX_KEY_SIZE] = '\0';
     return node;
 }
 
 pd_node_t *pd_alloc_integer_node(const char *group, const char *key, int value) {
     pd_node_t *node = pd_alloc_node(group, key);
-    node->type = PD_NODE_INT;
-    node->value.integer = value;
+    if (node) {
+        node->type = PD_NODE_INT;
+        node->value.integer = value;
+    }
     return node;
 }
 
 pd_node_t *pd_alloc_string_node(const char *group, const char *key, const char *value) {
-    pd_node_t *node = NULL;
-    if (value && strlen(value)) {
-        node = pd_alloc_node(group, key);
+    pd_node_t *node = pd_alloc_node(group, key);
+    if (node) {
         node->type = PD_NODE_STR;
-        strcpy(node->value.string, value);
+        if (value) {
+            strncpy(node->value.string, value, PD_MAX_VALUE_SIZE);
+            node->value.string[PD_MAX_VALUE_SIZE] = '\0';
+        } else {
+            node->value.string[0] = '\0';
+        }
     }
     return node;
 }
@@ -102,7 +111,7 @@ pd_node_t *pd_parse_line(const char *p) {
         strcpy(key, full_key);
     }
     size_t value_len = len - full_key_len - 1;
-    if (value_len == 0 || value_len > PD_MAX_VALUE_SIZE) {
+    if (value_len > PD_MAX_VALUE_SIZE) {
         return NULL;
     }
     char value[PD_MAX_VALUE_SIZE + 1];
@@ -130,6 +139,12 @@ int pd_read_file(const char *file_name, PD_NODE ***nodes) {
     fseek(file, 0, SEEK_END);
     const size_t size = ftell(file);
     fseek(file, 0, SEEK_SET);
+    if (!size) {
+        *nodes = realloc(*nodes, sizeof(pd_node_t *));
+        (*nodes)[0] = NULL;
+        fclose(file);
+        return 0;
+    }
 #ifdef PD_TEST_MODE
     printf("Buffer: %lu bytes\n", size);
 #endif
@@ -151,7 +166,7 @@ int pd_read_file(const char *file_name, PD_NODE ***nodes) {
             }
             p++;
         }
-        if (*p == '\0') {
+        if (!*p) {
             break;
         }
 
@@ -180,7 +195,7 @@ int pd_read_file(const char *file_name, PD_NODE ***nodes) {
                 (*nodes)[node_id] = NULL;
 #ifdef PD_TEST_MODE
                 printf("Reading line %d: ", line);
-                if (strlen(node->group)) {
+                if (*(node->group)) {
                     printf("%s.", node->group);
                 }
                 printf("%s=", node->key);
@@ -201,7 +216,7 @@ int pd_read_file(const char *file_name, PD_NODE ***nodes) {
                 free(buffer);
                 return line;
         }
-        if (*e == '\0') {
+        if (!*e) {
             break;
         }
         p = e + 1;

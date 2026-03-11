@@ -1,0 +1,15 @@
+000027:T:SyncTypeContacts=1
+000031:T:SyncTypeAppointments=0
+000024:T:SyncTypeTasks=0
+000024:T:SyncTypeNotes=0
+000031:T:LastSyncTypeContacts=0
+000035:T:LastSyncTypeAppointments=0
+000028:T:LastSyncTypeTasks=0
+000028:T:LastSyncTypeNotes=0
+000027:T:LastSyncContacts=0
+000031:T:LastSyncAppointments=0
+000024:T:LastSyncTasks=0
+000024:T:LastSyncNotes=0
+000021:T:bDateRange=0
+000020:T:SyncPast=14
+000023:T:SyncFuture=196

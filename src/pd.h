@@ -1,8 +1,8 @@
 #pragma once
 
-#define PD_MAX_GROUP_SIZE 32
-#define PD_MAX_KEY_SIZE 32
-#define PD_MAX_VALUE_SIZE 32
+#define PD_MAX_GROUP_SIZE 64
+#define PD_MAX_KEY_SIZE 64
+#define PD_MAX_VALUE_SIZE 128
 
 typedef enum {
     PD_NODE_INT,
@@ -12,12 +12,12 @@ typedef enum {
 typedef PD_NODE_TYPE pd_node_type_t;
 
 typedef struct {
-    char group[PD_MAX_GROUP_SIZE];
-    char key[PD_MAX_KEY_SIZE];
+    char group[PD_MAX_GROUP_SIZE + 1];
+    char key[PD_MAX_KEY_SIZE + 1];
     pd_node_type_t type;
     union {
         int integer;
-        char string[PD_MAX_VALUE_SIZE];
+        char string[PD_MAX_VALUE_SIZE + 1];
     } value;
 } PD_NODE;
 
