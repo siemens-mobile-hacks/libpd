@@ -22,6 +22,30 @@ Whitespace lines are ignored.
 ## API Reference
 
 ```C
+pd_node_t *pd_alloc_integer_node(const char *group, const char *key, int value);
+```
+Creates a new node holding an integer value.
+
+- Parameters
+  - `group` - group name (may be `NULL` or an empty string if no group is needed). The length must not exceed `PD_MAX_GROUP_SIZE`.
+  - `key` - key name (must not be `NULL` or empty, otherwise the function fails). The length must not exceed `PD_MAX_KEY_SIZE`.
+  - `value` - integer value to be stored in the node.
+
+Returns a pointer to the newly allocated `pd_node_t` structure or `NULL`.
+
+```C
+pd_node_t *pd_alloc_string_node(const char *group, const char *key, const char *value);
+```
+Creates a new node holding a string value.
+
+- Parameters
+  - `group` - group name (may be `NULL` or an empty string if no group is needed). The length must not exceed `PD_MAX_GROUP_SIZE`.
+  - `key` - key name (must not be `NULL` or empty, otherwise the function fails). The length must not exceed `PD_MAX_KEY_SIZE`.
+  - `value` - string to store. If `NULL` or an empty string, the function returns `NULL`. The length must not exceed `PD_MAX_VALUE_SIZE`.
+
+Returns a pointer to the newly allocated `pd_node_t` structure or `NULL`.
+
+```C
 int pd_read_file(const char *file_name, pd_node_t ***nodes);
 ```
 Reads a `.pd` file and creates an array of nodes.
