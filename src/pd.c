@@ -260,6 +260,12 @@ int pd_write_file(const char *file_name, const pd_node_t **nodes) {
     return 0;
 }
 
+void pd_free_node(pd_node_t *node) {
+    if (node) {
+        free(node);
+    }
+}
+
 void pd_free_nodes(pd_node_t **nodes) {
     if (nodes) {
         for (int i = 0; nodes[i] != NULL; i++) {
