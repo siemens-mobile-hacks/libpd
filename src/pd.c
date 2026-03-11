@@ -7,32 +7,39 @@
 #include <string.h>
 #include "pd.h"
 
-#define TAG_SIZE 3
-#define LEN_DIGITS 6
-#define INFO_SIZE (LEN_DIGITS + TAG_SIZE)
-#define MAX_PAYLOAD_SIZE (PD_MAX_GROUP_SIZE + PD_MAX_KEY_SIZE + 1)
-#define MAX_LINE_SIZE (MAX_PAYLOAD_SIZE + PD_MAX_VALUE_SIZE + 1)
+#define PD_TAG_LEN 3
+#define PD_DIGITS_LEN 6
+#define PD_INFO_LEN (PD_DIGITS_LEN + PD_TAG_LEN)
+#define PD_MAX_FULL_KEY_LEN (PD_MAX_GROUP_SIZE + PD_MAX_KEY_SIZE + 1) // + '.'
+#define PD_MAX_LINE_LEN (PD_MAX_FULL_KEY_LEN + PD_MAX_VALUE_SIZE + 1) // + '='
+#define PD_TAG_MARK ":T:"
 
 pd_node_t *pd_alloc_node(const char *group, const char *key) {
-    pd_node_t *node = malloc(sizeof(pd_node_t));
-    strcpy(node->group, group);
-    strcpy(node->key, key);
+    pd_node_t *node = NULL;
+    const int is_group = (group && strlen(group));
+    const int is_key = (key && strlen(key));
+    if ((is_group && is_key) || is_key) {
+        node = malloc(sizeof(pd_node_t));
+        if (is_group) {
+            strcpy(node->group, group);
+        }
+        strcpy(node->key, key);
+    }
     return node;
 }
 
 pd_node_t *pd_alloc_integer_node(const char *group, const char *key, int value) {
     pd_node_t *node = pd_alloc_node(group, key);
     node->type = PD_NODE_INT;
-    if (value) {
-        node->value.integer = value;
-    }
+    node->value.integer = value;
     return node;
 }
 
 pd_node_t *pd_alloc_string_node(const char *group, const char *key, const char *value) {
-    pd_node_t *node = pd_alloc_node(group, key);
-    node->type = PD_NODE_STR;
-    if (value) {
+    pd_node_t *node = NULL;
+    if (value && strlen(value)) {
+        node = pd_alloc_node(group, key);
+        node->type = PD_NODE_STR;
         strcpy(node->value.string, value);
     }
     return node;
@@ -42,59 +49,59 @@ pd_node_t *pd_parse_line(const char *p) {
     char *endptr = NULL;
 
     char length[8];
-    char *t = strstr(p, ":T:");
-    if (!t || (t - p) != LEN_DIGITS) {
+    char *t = strstr(p, PD_TAG_MARK);
+    if (!t || (t - p) != PD_DIGITS_LEN) {
         return NULL;
     }
-    strncpy(length, p, LEN_DIGITS);
-    length[LEN_DIGITS] = '\0';
+    strncpy(length, p, PD_DIGITS_LEN);
+    length[PD_DIGITS_LEN] = '\0';
     size_t len = strtoul(length, &endptr, 10);
-    if (endptr == length || *endptr != '\0' || len <= INFO_SIZE) {
+    if (endptr == length || *endptr != '\0' || len <= PD_INFO_LEN) {
         return NULL;
     }
-    len -= INFO_SIZE;
-    if (len > MAX_LINE_SIZE) { // + ".="
+    len -= PD_INFO_LEN;
+    if (len > PD_MAX_LINE_LEN) {
         return NULL;
     }
-    char content[MAX_LINE_SIZE + 1]; // + ".=" + '\0'
-    strncpy(content, p + INFO_SIZE, len);
+    char content[PD_MAX_LINE_LEN + 1];
+    strncpy(content, p + PD_INFO_LEN, len);
     content[len] = '\0';
 
     const char *equal = strchr(content, '=');
     if (!equal) {
         return NULL;
     }
-    size_t payload_len = equal - content;
-    if (payload_len < 1 || payload_len > MAX_PAYLOAD_SIZE || payload_len > len) { // + '.'
+    size_t full_key_len = equal - content;
+    if (full_key_len < 1 || full_key_len > PD_MAX_FULL_KEY_LEN || full_key_len > len) { // + '.'
         return NULL;
     }
-    char payload[MAX_PAYLOAD_SIZE + 1]; // + '.' + '\0'
-    strncpy(payload, content, payload_len);
-    payload[payload_len] = '\0';
+    char full_key[PD_MAX_FULL_KEY_LEN + 1];
+    strncpy(full_key, content, full_key_len);
+    full_key[full_key_len] = '\0';
     char group[PD_MAX_GROUP_SIZE + 1];
     char key[PD_MAX_KEY_SIZE + 1];
-    const char *dot = strchr(payload, '.');
+    const char *dot = strchr(full_key, '.');
     if (dot) {
-        const size_t group_len = dot - payload;
-        const size_t key_len = payload_len - group_len - 1; // - '.'
+        const size_t group_len = dot - full_key;
+        const size_t key_len = full_key_len - group_len - 1; // - '.'
         if (group_len < 1 || group_len > PD_MAX_GROUP_SIZE) {
             return NULL;
         }
         if (key_len < 1 || key_len > PD_MAX_KEY_SIZE) {
             return NULL;
         }
-        strncpy(group, payload, group_len);
+        strncpy(group, full_key, group_len);
         group[group_len] = '\0';
         strncpy(key, dot + 1, key_len);
         key[key_len] = '\0';
     } else {
-        if (payload_len > PD_MAX_KEY_SIZE) {
+        if (full_key_len > PD_MAX_KEY_SIZE) {
             return NULL;
         }
         group[0] = '\0';
-        strcpy(key, payload);
+        strcpy(key, full_key);
     }
-    size_t value_len = len - payload_len - 1;
+    size_t value_len = len - full_key_len - 1;
     if (value_len == 0 || value_len > PD_MAX_VALUE_SIZE) {
         return NULL;
     }
@@ -154,7 +161,7 @@ int pd_read_file(const char *file_name, PD_NODE ***nodes) {
         }
         line++;
         const size_t len = e - p;
-        if (len > INFO_SIZE) {
+        if (len > PD_INFO_LEN) {
             const char saved = *e;
             *e = '\0';
             pd_node_t *node = pd_parse_line(p);
@@ -210,18 +217,18 @@ int pd_write_file(const char *file_name, const pd_node_t **nodes) {
     }
     for (int i = 0; nodes[i] != NULL; i++) {
         const pd_node_t *node = nodes[i];
-        char line[MAX_LINE_SIZE + 2]; //
-        size_t group_len = strlen(node->group);
-        size_t key_len = strlen(node->key);
+        char line[PD_MAX_LINE_LEN + 2]; //
+        const size_t group_len = strlen(node->group);
+        const size_t key_len = strlen(node->key);
         char value[PD_MAX_VALUE_SIZE + 1];
         if (node->type == PD_NODE_INT) {
             sprintf(value, "%d", node->value.integer);
         } else {
             strcpy(value, node->value.string);
         }
-        size_t value_len = strlen(value);
+        const size_t value_len = strlen(value);
 
-        size_t line_len = key_len + value_len + INFO_SIZE + 1;
+        size_t line_len = key_len + value_len + PD_INFO_LEN + 1;
         if (group_len) {
             line_len += group_len + 1;
         }
