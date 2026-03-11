@@ -295,6 +295,36 @@ size_t pd_get_size(pd_node_t **nodes) {
     return i;
 }
 
+void pd_add_node(pd_node_t ***nodes, pd_node_t *node) {
+    if (!node) {
+        return;
+    }
+    const size_t size = pd_get_size(*nodes);
+    pd_node_t **new_nodes = realloc(*nodes, sizeof(pd_node_t *) * (size + 2));
+    if (!new_nodes) {
+        return;
+    }
+    new_nodes[size] = node;
+    new_nodes[size + 1] = NULL;
+    *nodes = new_nodes;
+}
+
+void pd_delete_node(pd_node_t ***nodes, size_t id) {
+    pd_node_t **n = *nodes;
+    const size_t size = pd_get_size(n);
+    if (id >= size) {
+        return;
+    }
+    pd_free_node(n[id]);
+    for (size_t i = id; i < size; i++) {
+        n[i] = n[i + 1];
+    }
+    pd_node_t **new_nodes = realloc(*nodes, sizeof(pd_node_t *) * (size));
+    if (new_nodes) {
+        *nodes = new_nodes;
+    }
+}
+
 void pd_free_node(pd_node_t *node) {
     if (node) {
         free(node);

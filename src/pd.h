@@ -32,5 +32,9 @@ size_t pd_get_max_group_size();
 size_t pd_get_max_key_size();
 size_t pd_get_max_value_size();
 size_t pd_get_size(pd_node_t **nodes);
+
+void pd_add_node(pd_node_t ***nodes, pd_node_t *node);
+void pd_delete_node(pd_node_t ***nodes, size_t id);
+
 void pd_free_node(pd_node_t *node);
 void pd_free_nodes(pd_node_t **nodes);
