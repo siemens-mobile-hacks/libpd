@@ -25,8 +25,10 @@ typedef PD_NODE pd_node_t;
 
 pd_node_t *pd_alloc_integer_node(const char *group, const char *key, long value);
 pd_node_t *pd_alloc_string_node(const char *group, const char *key, const char *value);
-int pd_read_file(const char *file_name, pd_node_t ***nodes);
-int pd_write_file(const char *file_name, const pd_node_t **nodes);
+int pd_read_file(const char *path, pd_node_t ***nodes);
+int pd_read_file_ws(const WSHDR *path, pd_node_t ***nodes);
+int pd_write_file(const char *path, const pd_node_t **nodes);
+int pd_write_file_ws(const WSHDR *path, const pd_node_t **nodes);
 
 size_t pd_get_max_group_size();
 size_t pd_get_max_key_size();

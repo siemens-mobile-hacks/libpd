@@ -128,8 +128,8 @@ static pd_node_t *pd_parse_line(const char *p) {
     return node;
 }
 
-int pd_read_file(const char *file_name, PD_NODE ***nodes) {
-    FILE *file = fopen(file_name, "r");
+int pd_read_file(const char *path, pd_node_t ***nodes) {
+    FILE *file = fopen(path, "r");
     if (!file) {
         return -1;
     }
@@ -225,8 +225,14 @@ int pd_read_file(const char *file_name, PD_NODE ***nodes) {
     return 0;
 }
 
-int pd_write_file(const char *file_name, const pd_node_t **nodes) {
-    FILE *file = fopen(file_name, "w");
+int pd_read_file_ws(const WSHDR *path, pd_node_t ***nodes) {
+    char p[256 + 1];
+    ws_2str(path, p, 255);
+    return pd_read_file(p, nodes);
+}
+
+int pd_write_file(const char *path, const pd_node_t **nodes) {
+    FILE *file = fopen(path, "w");
     if (!file) {
         return -1;
     }
@@ -273,6 +279,12 @@ int pd_write_file(const char *file_name, const pd_node_t **nodes) {
     }
     fclose(file);
     return 0;
+}
+
+int pd_write_file_ws(const WSHDR *path, const pd_node_t **nodes) {
+    char p[256 + 1];
+    ws_2str(path, p, 255);
+    return pd_write_file(p, nodes);
 }
 
 size_t pd_get_max_group_size() {

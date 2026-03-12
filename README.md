@@ -55,12 +55,12 @@ Creates a new node holding a string value.
 Returns a pointer to the newly allocated `pd_node_t` structure or `NULL`.
 
 ```C
-int pd_read_file(const char *file_name, pd_node_t ***nodes);
+int pd_read_file(const char *path, pd_node_t ***nodes);
 ```
 Reads a `.pd` file and creates an array of nodes.
 
 - Parameters
-  - `file_name` - path to the input file.
+  - `path` - path to the input file.
   - `nodes` - output parameter. On success, `*nodes` points to a newly allocated NULL‑terminated array of `pd_node_t*` pointers.
 - Returns
   - `0` on success (including the case of an empty file, in which case a minimal array containing only a `NULL` pointer is allocated).
@@ -69,17 +69,27 @@ Reads a `.pd` file and creates an array of nodes.
   - Negative values for other I/O or memory errors.
 
 ```C
-int pd_write_file(const char *file_name, const pd_node_t **nodes);
+int pd_read_file_ws(const WSHDR *path, pd_node_t ***nodes);
+```
+`WSHDR` version of `pd_read_file`.
+
+```C
+int pd_write_file(const char *path, const pd_node_t **nodes);
 ```
 Writes an array of nodes to a file in the `.pd` format.
 
 - Parameters
-  - `file_name` - path to the output file.
+  - `path` - path to the output file.
   - `nodes` - NULL‑terminated array of node pointers.
 - Returns
   - `0` on success.
   - `-1` if the file cannot be created.
   - `-2` if a write error occurs.
+
+```C
+int pd_write_file_ws(const WSHDR *path, const pd_node_t **nodes);
+```
+`WSHDR` version of `pd_write_file`.
 
 ```C
 size_t pd_get_max_group_size(void);
