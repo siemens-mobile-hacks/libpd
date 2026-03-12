@@ -54,7 +54,7 @@ pd_node_t *pd_alloc_string_node(const char *group, const char *key, const char *
     return node;
 }
 
-pd_node_t *pd_parse_line(const char *p) {
+static pd_node_t *pd_parse_line(const char *p) {
     char *endptr = NULL;
 
     char length[8];
@@ -80,7 +80,7 @@ pd_node_t *pd_parse_line(const char *p) {
     if (!equal) {
         return NULL;
     }
-    size_t full_key_len = equal - content;
+    const size_t full_key_len = equal - content;
     if (full_key_len < 1 || full_key_len > PD_MAX_FULL_KEY_LEN || full_key_len > len) { // + '.'
         return NULL;
     }
