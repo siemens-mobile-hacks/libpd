@@ -20,6 +20,14 @@ Each line in a `.pd` file has the following structure:
 
 Whitespace lines are ignored.
 
+## Building
+The SDK must be located at `../../sdk` relative to the project root.
+```bash
+mkdir build && cd build
+cmake ..
+make
+```
+
 ## API Reference
 
 ```C
