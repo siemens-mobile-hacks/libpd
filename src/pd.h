@@ -1,5 +1,9 @@
 #pragma once
 
+#ifndef PD_TEST_MODE
+    #include <swilib.h>
+#endif
+
 #define PD_MAX_GROUP_SIZE 64
 #define PD_MAX_KEY_SIZE 64
 #define PD_MAX_VALUE_SIZE 128
@@ -26,9 +30,11 @@ typedef PD_NODE pd_node_t;
 pd_node_t *pd_alloc_integer_node(const char *group, const char *key, long value);
 pd_node_t *pd_alloc_string_node(const char *group, const char *key, const char *value);
 int pd_read_file(const char *path, pd_node_t ***nodes);
-int pd_read_file_ws(const WSHDR *path, pd_node_t ***nodes);
 int pd_write_file(const char *path, const pd_node_t **nodes);
+#ifndef PD_TEST_MODE
+int pd_read_file_ws(const WSHDR *path, pd_node_t ***nodes);
 int pd_write_file_ws(const WSHDR *path, const pd_node_t **nodes);
+#endif
 
 size_t pd_get_max_group_size();
 size_t pd_get_max_key_size();

@@ -1,6 +1,3 @@
-#ifndef PD_TEST_MODE
-    #include <swilib.h>
-#endif
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -134,7 +131,7 @@ int pd_read_file(const char *path, pd_node_t ***nodes) {
         return -1;
     }
 #ifdef PD_TEST_MODE
-    printf("Reading file: '%s'\n", file_name);
+    printf("Reading file: '%s'\n", path);
 #endif
     fseek(file, 0, SEEK_END);
     const size_t size = ftell(file);
@@ -225,11 +222,13 @@ int pd_read_file(const char *path, pd_node_t ***nodes) {
     return 0;
 }
 
+#ifndef PD_TEST_MODE
 int pd_read_file_ws(const WSHDR *path, pd_node_t ***nodes) {
     char p[256 + 1];
-    ws_2str(path, p, 255);
+    ws_2str(path, p, 256);
     return pd_read_file(p, nodes);
 }
+#endif
 
 int pd_write_file(const char *path, const pd_node_t **nodes) {
     FILE *file = fopen(path, "w");
@@ -281,11 +280,13 @@ int pd_write_file(const char *path, const pd_node_t **nodes) {
     return 0;
 }
 
+#ifndef PD_TEST_MODE
 int pd_write_file_ws(const WSHDR *path, const pd_node_t **nodes) {
     char p[256 + 1];
-    ws_2str(path, p, 255);
+    ws_2str(path, p, 256);
     return pd_write_file(p, nodes);
 }
+#endif
 
 size_t pd_get_max_group_size() {
     return PD_MAX_GROUP_SIZE;
